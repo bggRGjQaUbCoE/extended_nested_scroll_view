@@ -287,6 +287,10 @@ class _ExtendedNestedScrollPosition extends _NestedScrollPosition {
           maxScrollExtent - coordinator.pinnedHeaderSliverHeightBuilder!();
       maxScrollExtent = math.max(0.0, maxScrollExtent);
     }
+    /// 修复不满屏时，滑动卡顿的问题
+    if (debugLabel == 'inner' && coordinator.pinnedHeaderSliverHeightBuilder != null) {
+      maxScrollExtent = math.max(maxScrollExtent, 0.1);
+    }
     return super.applyContentDimensions(minScrollExtent, maxScrollExtent);
   }
 
