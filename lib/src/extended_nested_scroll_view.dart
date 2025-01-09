@@ -1487,7 +1487,7 @@ class _NestedScrollPosition extends ScrollPosition
       forcePixels(actualNewPixels);
       didUpdateScrollPositionBy(actualNewPixels - oldPixels);
     }
-    if (overscroll != 0.0) {
+    if (overscroll != 0.0 && activity?.isScrolling == true) {
       didOverscrollBy(overscroll);
       return overscroll;
     }
