@@ -182,19 +182,19 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
       return;
     }
 
-    // bool innerCanDrag = false;
-    // for (final _NestedScrollPosition position in _innerPositions) {
-    //   if (!position.haveDimensions) {
-    //     return;
-    //   }
-    //   innerCanDrag = innerCanDrag
-    //       // This refers to the physics of the actual inner scroll position, not
-    //       // the whole NestedScrollView, since it is possible to have different
-    //       // ScrollPhysics for the inner and outer positions.
-    //       ||
-    //       position.physics.shouldAcceptUserOffset(position);
-    // }
-    // _outerPosition!.updateCanDrag(innerCanDrag);
+    bool innerCanDrag = false;
+    for (final _NestedScrollPosition position in _innerPositions) {
+      if (!position.haveDimensions) {
+        return;
+      }
+      innerCanDrag = innerCanDrag
+          // This refers to the physics of the actual inner scroll position, not
+          // the whole NestedScrollView, since it is possible to have different
+          // ScrollPhysics for the inner and outer positions.
+          ||
+          position.physics.shouldAcceptUserOffset(position);
+    }
+    _outerPosition!.updateCanDrag(innerCanDrag);
   }
 }
 
