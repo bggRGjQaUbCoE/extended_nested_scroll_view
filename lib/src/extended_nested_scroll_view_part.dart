@@ -20,12 +20,12 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
           floatHeaderSlivers,
         ) {
     final double initialScrollOffset = _parent?.initialScrollOffset ?? 0.0;
-    _outerController = _ExtendedNestedScrollController(
+    _outerController = ExtendedNestedScrollController(
       this,
       initialScrollOffset: initialScrollOffset,
       debugLabel: 'outer',
     );
-    _innerController = _ExtendedNestedScrollController(
+    _innerController = ExtendedNestedScrollController(
       this,
       initialScrollOffset: 0.0,
       debugLabel: 'inner',
@@ -51,8 +51,8 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
   final Axis scrollDirection;
 
   @override
-  _ExtendedNestedScrollController get _innerController =>
-      super._innerController as _ExtendedNestedScrollController;
+  ExtendedNestedScrollController get _innerController =>
+      super._innerController as ExtendedNestedScrollController;
 
   /// The [TabBarView]/[PageView] in body should perpendicular with The Axis of
   /// [ExtendedNestedScrollView].
@@ -195,61 +195,6 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
           position.physics.shouldAcceptUserOffset(position);
     }
     _outerPosition!.updateCanDrag(innerCanDrag);
-  }
-}
-
-class _ExtendedNestedScrollController extends _NestedScrollController {
-  _ExtendedNestedScrollController(
-    _ExtendedNestedScrollCoordinator coordinator, {
-    double initialScrollOffset = 0.0,
-    String? debugLabel,
-  }) : super(
-          coordinator,
-          initialScrollOffset: initialScrollOffset,
-          debugLabel: debugLabel,
-        );
-  @override
-  _ExtendedNestedScrollCoordinator get coordinator =>
-      super.coordinator as _ExtendedNestedScrollCoordinator;
-
-  @override
-  Iterable<_ExtendedNestedScrollPosition> get nestedPositions =>
-      kDebugMode ? _debugNestedPositions : _releaseNestedPositions;
-
-  Iterable<_ExtendedNestedScrollPosition> get _debugNestedPositions {
-    return Iterable.castFrom<ScrollPosition, _ExtendedNestedScrollPosition>(
-        positions);
-  }
-
-  Iterable<_ExtendedNestedScrollPosition> get _releaseNestedPositions sync* {
-    yield* Iterable.castFrom<ScrollPosition, _ExtendedNestedScrollPosition>(
-        positions);
-  }
-
-  @override
-  void attach(ScrollPosition position) {
-    assert(position is _NestedScrollPosition);
-    super.attach(position);
-    coordinator.updateParent();
-    coordinator.updateCanDrag(position: position as _NestedScrollPosition);
-    position.addListener(_scheduleUpdateShadow);
-    _scheduleUpdateShadow();
-  }
-
-  @override
-  ScrollPosition createScrollPosition(
-    ScrollPhysics physics,
-    ScrollContext context,
-    ScrollPosition? oldPosition,
-  ) {
-    return _ExtendedNestedScrollPosition(
-      coordinator: coordinator,
-      physics: physics,
-      context: context,
-      initialPixels: initialScrollOffset,
-      oldPosition: oldPosition,
-      debugLabel: debugLabel,
-    );
   }
 }
 

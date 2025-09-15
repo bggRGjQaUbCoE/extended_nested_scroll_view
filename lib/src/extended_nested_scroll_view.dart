@@ -1766,3 +1766,59 @@ class _NestedOuterBallisticScrollActivity extends BallisticScrollActivity {
     return '${objectRuntimeType(this, '_NestedOuterBallisticScrollActivity')}(${metrics.minRange} .. ${metrics.maxRange}; correcting by ${metrics.correctionOffset})';
   }
 }
+
+
+class ExtendedNestedScrollController extends _NestedScrollController {
+  ExtendedNestedScrollController(
+    _ExtendedNestedScrollCoordinator coordinator, {
+    double initialScrollOffset = 0.0,
+    String? debugLabel,
+  }) : super(
+          coordinator,
+          initialScrollOffset: initialScrollOffset,
+          debugLabel: debugLabel,
+        );
+  @override
+  _ExtendedNestedScrollCoordinator get coordinator =>
+      super.coordinator as _ExtendedNestedScrollCoordinator;
+
+  @override
+  Iterable<_ExtendedNestedScrollPosition> get nestedPositions =>
+      kDebugMode ? _debugNestedPositions : _releaseNestedPositions;
+
+  Iterable<_ExtendedNestedScrollPosition> get _debugNestedPositions {
+    return Iterable.castFrom<ScrollPosition, _ExtendedNestedScrollPosition>(
+        positions);
+  }
+
+  Iterable<_ExtendedNestedScrollPosition> get _releaseNestedPositions sync* {
+    yield* Iterable.castFrom<ScrollPosition, _ExtendedNestedScrollPosition>(
+        positions);
+  }
+
+  @override
+  void attach(ScrollPosition position) {
+    assert(position is _NestedScrollPosition);
+    super.attach(position);
+    coordinator.updateParent();
+    coordinator.updateCanDrag(position: position as _NestedScrollPosition);
+    position.addListener(_scheduleUpdateShadow);
+    _scheduleUpdateShadow();
+  }
+
+  @override
+  ScrollPosition createScrollPosition(
+    ScrollPhysics physics,
+    ScrollContext context,
+    ScrollPosition? oldPosition,
+  ) {
+    return _ExtendedNestedScrollPosition(
+      coordinator: coordinator,
+      physics: physics,
+      context: context,
+      initialPixels: initialScrollOffset,
+      oldPosition: oldPosition,
+      debugLabel: debugLabel,
+    );
+  }
+}
