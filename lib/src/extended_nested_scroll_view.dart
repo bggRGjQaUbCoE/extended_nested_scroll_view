@@ -1767,7 +1767,6 @@ class _NestedOuterBallisticScrollActivity extends BallisticScrollActivity {
   }
 }
 
-
 class ExtendedNestedScrollController extends _NestedScrollController {
   ExtendedNestedScrollController(
     _ExtendedNestedScrollCoordinator coordinator, {

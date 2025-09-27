@@ -61,53 +61,59 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
 
   @override
   Iterable<_ExtendedNestedScrollPosition> get _innerPositions {
-    if (_innerController.nestedPositions.length > 1 && onlyOneScrollInBody) {
-      final Iterable<_ExtendedNestedScrollPosition> actived = _innerController
-          .nestedPositions
-          .where((_ExtendedNestedScrollPosition element) => element.isActived);
-      if (actived.isEmpty) {
-        for (final _ExtendedNestedScrollPosition scrollPosition
-            in _innerController.nestedPositions) {
-          // TODO(zmtzawqlp): throw exception even mounted is true
-          // In order for an element to have a valid renderObject, it must be '
-          //  'active, which means it is part of the tree.\n'
-          //  'Instead, this element is in the $_lifecycleState state.\n'
-          //  'If you called this method from a State object, consider guarding '
-          //  'it with State.mounted.
-          try {
-            if (!(scrollPosition.context as ScrollableState).mounted) {
-              continue;
-            }
-            final RenderObject? renderObject =
-                scrollPosition.context.storageContext.findRenderObject();
-            if (renderObject == null || !renderObject.attached) {
-              continue;
-            }
+    final Iterable<_ExtendedNestedScrollPosition> positions =
+        _innerController.nestedPositions;
 
-            final VisibilityInfo? visibilityInfo =
-                ExtendedVisibilityDetector.of(
-                    scrollPosition.context.storageContext);
-            if (visibilityInfo != null && visibilityInfo.visibleFraction == 1) {
-              if (kDebugMode) {
-                print('${visibilityInfo.key} is visible');
-              }
-              return <_ExtendedNestedScrollPosition>[scrollPosition];
-            }
-
-            if (renderObjectIsVisible(renderObject, bodyScrollDirection)) {
-              return <_ExtendedNestedScrollPosition>[scrollPosition];
-            }
-          } catch (e) {
-            continue;
-          }
-        }
-        return _innerController.nestedPositions;
-      }
-
-      return actived;
-    } else {
-      return _innerController.nestedPositions;
+    if (positions.length <= 1 || !onlyOneScrollInBody) {
+      return positions;
     }
+
+    final Iterable<_ExtendedNestedScrollPosition> actived =
+        positions.where((_ExtendedNestedScrollPosition e) => e.isActived);
+    if (actived.isNotEmpty) {
+      return actived;
+    }
+
+    for (int i = positions.length - 1; i >= 0; i--) {
+      final _ExtendedNestedScrollPosition scrollPosition =
+          positions.elementAt(i);
+      // TODO(zmtzawqlp): throw exception even mounted is true
+      // In order for an element to have a valid renderObject, it must be '
+      //  'active, which means it is part of the tree.\n'
+      //  'Instead, this element is in the $_lifecycleState state.\n'
+      //  'If you called this method from a State object, consider guarding '
+      //  'it with State.mounted.
+
+      try {
+        if (!(scrollPosition.context as ScrollableState).mounted) {
+          continue;
+        }
+
+        final RenderObject? renderObject =
+            scrollPosition.context.storageContext.findRenderObject();
+        if (renderObject == null || !renderObject.attached) {
+          continue;
+        }
+
+        final VisibilityInfo? visibilityInfo = ExtendedVisibilityDetector.of(
+            scrollPosition.context.storageContext);
+        if (visibilityInfo != null && visibilityInfo.visibleFraction == 1) {
+          if (kDebugMode) {
+            print('${visibilityInfo.key} is visible');
+          }
+          return <_ExtendedNestedScrollPosition>[scrollPosition];
+        }
+
+        if (renderObjectIsVisible(renderObject, bodyScrollDirection)) {
+          return <_ExtendedNestedScrollPosition>[scrollPosition];
+        }
+      } catch (_) {
+        // Silently ignore and continue
+        continue;
+      }
+    }
+
+    return positions;
   }
 
   /// Return whether renderObject is visible in parent
@@ -232,8 +238,10 @@ class _ExtendedNestedScrollPosition extends _NestedScrollPosition {
           maxScrollExtent - coordinator.pinnedHeaderSliverHeightBuilder!();
       maxScrollExtent = math.max(0.0, maxScrollExtent);
     }
+
     /// 修复不满屏时，滑动卡顿的问题
-    if (debugLabel == 'inner' && coordinator.pinnedHeaderSliverHeightBuilder != null) {
+    if (debugLabel == 'inner' &&
+        coordinator.pinnedHeaderSliverHeightBuilder != null) {
       maxScrollExtent = math.max(maxScrollExtent, 0.1);
     }
     return super.applyContentDimensions(minScrollExtent, maxScrollExtent);
