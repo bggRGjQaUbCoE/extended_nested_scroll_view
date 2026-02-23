@@ -6,19 +6,14 @@ typedef NestedScrollViewPinnedHeaderSliverHeightBuilder = double Function();
 
 class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
   _ExtendedNestedScrollCoordinator(
-    ExtendedNestedScrollViewState state,
-    ScrollController? parent,
-    VoidCallback onHasScrolledBodyChanged,
-    bool floatHeaderSlivers,
+    super.state,
+    super.parent,
+    super.onHasScrolledBodyChanged,
+    super.floatHeaderSlivers,
     this.pinnedHeaderSliverHeightBuilder,
     this.onlyOneScrollInBody,
     this.scrollDirection,
-  ) : super(
-          state,
-          parent,
-          onHasScrolledBodyChanged,
-          floatHeaderSlivers,
-        ) {
+  ) {
     final double initialScrollOffset = _parent?.initialScrollOffset ?? 0.0;
     _outerController = ExtendedNestedScrollController(
       this,
@@ -152,7 +147,7 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
     if (object == null) {
       return null;
     }
-    object = object.parent as RenderObject?;
+    object = object.parent;
     while (object != null) {
       // only find in body
       if (object is _ExtendedRenderSliverFillRemainingWithScrollable) {
@@ -161,7 +156,7 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
       if (object is RenderViewport) {
         return object;
       }
-      object = object.parent as RenderObject?;
+      object = object.parent;
     }
     return null;
   }
@@ -206,20 +201,13 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
 
 class _ExtendedNestedScrollPosition extends _NestedScrollPosition {
   _ExtendedNestedScrollPosition({
-    required ScrollPhysics physics,
-    required ScrollContext context,
-    double initialPixels = 0.0,
-    ScrollPosition? oldPosition,
-    String? debugLabel,
-    required _ExtendedNestedScrollCoordinator coordinator,
-  }) : super(
-          physics: physics,
-          context: context,
-          oldPosition: oldPosition,
-          debugLabel: debugLabel,
-          coordinator: coordinator,
-          initialPixels: initialPixels,
-        );
+    required super.physics,
+    required super.context,
+    super.initialPixels,
+    super.oldPosition,
+    super.debugLabel,
+    required _ExtendedNestedScrollCoordinator super.coordinator,
+  });
   @override
   _ExtendedNestedScrollCoordinator get coordinator =>
       super.coordinator as _ExtendedNestedScrollCoordinator;
@@ -268,9 +256,8 @@ class _ExtendedNestedScrollPosition extends _NestedScrollPosition {
 class _ExtendedSliverFillRemainingWithScrollable
     extends SingleChildRenderObjectWidget {
   const _ExtendedSliverFillRemainingWithScrollable({
-    Key? key,
-    Widget? child,
-  }) : super(key: key, child: child);
+    super.child,
+  });
 
   @override
   _ExtendedRenderSliverFillRemainingWithScrollable createRenderObject(

@@ -4,10 +4,10 @@ import 'package:visibility_detector/visibility_detector.dart';
 ///
 class ExtendedVisibilityDetector extends StatefulWidget {
   const ExtendedVisibilityDetector({
-    Key? key,
+    super.key,
     required this.child,
     required this.uniqueKey,
-  }) : super(key: key);
+  });
 
   final Widget child;
   final Key uniqueKey;

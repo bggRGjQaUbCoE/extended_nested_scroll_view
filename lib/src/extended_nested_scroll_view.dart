@@ -1,6 +1,8 @@
 // ignore_for_file: unnecessary_cast
 
 import 'dart:math' as math;
+
+import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +10,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-import '../extended_nested_scroll_view.dart';
 part 'extended_nested_scroll_view_part.dart';
 
 // ignore_for_file: unnecessary_null_comparison, always_put_control_body_on_new_line
@@ -560,8 +561,9 @@ class ExtendedNestedScrollViewState extends State<ExtendedNestedScrollView> {
   @override
   void didUpdateWidget(ExtendedNestedScrollView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.controller != widget.controller)
+    if (oldWidget.controller != widget.controller) {
       _coordinator!.setParent(widget.controller);
+    }
   }
 
   @override
@@ -592,7 +594,7 @@ class ExtendedNestedScrollViewState extends State<ExtendedNestedScrollView> {
 
   @override
   Widget build(BuildContext context) {
-    final ScrollPhysics _scrollPhysics =
+    final ScrollPhysics scrollPhysics =
         widget.physics?.applyTo(const ClampingScrollPhysics()) ??
             widget.scrollBehavior
                 ?.getScrollPhysics(context)
@@ -608,7 +610,7 @@ class ExtendedNestedScrollViewState extends State<ExtendedNestedScrollView> {
             dragStartBehavior: widget.dragStartBehavior,
             scrollDirection: widget.scrollDirection,
             reverse: widget.reverse,
-            physics: _scrollPhysics,
+            physics: scrollPhysics,
             scrollBehavior: widget.scrollBehavior ??
                 ScrollConfiguration.of(context).copyWith(scrollbars: false),
             controller: _coordinator!._outerController,
@@ -1137,16 +1139,18 @@ class _NestedScrollCoordinator
           outerDelta,
         );
         if (innerDelta.notZero) {
-          for (final _NestedScrollPosition position in _innerPositions)
+          for (final _NestedScrollPosition position in _innerPositions) {
             position.applyClampedPointerSignalUpdate(innerDelta);
+          }
         }
       }
     } else {
       // Dragging "down" - delta is negative
       double innerDelta = delta;
       // Apply delta to the outer header first if it is configured to float.
-      if (_floatHeaderSlivers)
+      if (_floatHeaderSlivers) {
         innerDelta = _outerPosition!.applyClampedPointerSignalUpdate(delta);
+      }
 
       if (innerDelta.notZero) {
         // Apply the innerDelta, if we have not floated in the outer scrollable,
@@ -1223,7 +1227,14 @@ class _NestedScrollCoordinator
       // view, so that the app bar will scroll out of the way asap.
       double outerDelta = delta;
       for (final _NestedScrollPosition position in _innerPositions) {
-        if (position.pixels < 0.0) {
+        if (position.pixels == 0.0) {
+          final physics = position.physics.parent;
+          if (physics is RefreshScrollPhysics &&
+              (physics as RefreshScrollPhysics)
+                  .onDrag(delta, position.viewportDimension)) {
+            return;
+          }
+        } else if (position.pixels < 0.0) {
           // This inner position is in overscroll.
           final double potentialOuterDelta =
               position.applyClampedDragUpdate(delta);
@@ -1247,8 +1258,9 @@ class _NestedScrollCoordinator
       // Dragging "down" - delta is positive
       double innerDelta = delta;
       // Apply delta to the outer header first if it is configured to float.
-      if (_floatHeaderSlivers)
+      if (_floatHeaderSlivers) {
         innerDelta = _outerPosition!.applyClampedDragUpdate(delta);
+      }
 
       if (innerDelta.notZero) {
         // Apply the innerDelta, if we have not floated in the outer scrollable,
@@ -1331,8 +1343,9 @@ class _NestedScrollController extends ScrollController {
   void attach(ScrollPosition position) {
     assert(position is _NestedScrollPosition);
     super.attach(position);
-    coordinator.updateParent();
-    coordinator.updateCanDrag();
+    coordinator
+      ..updateParent()
+      ..updateCanDrag();
     position.addListener(_scheduleUpdateShadow);
     _scheduleUpdateShadow();
   }
@@ -1769,14 +1782,10 @@ class _NestedOuterBallisticScrollActivity extends BallisticScrollActivity {
 
 class ExtendedNestedScrollController extends _NestedScrollController {
   ExtendedNestedScrollController(
-    _ExtendedNestedScrollCoordinator coordinator, {
-    double initialScrollOffset = 0.0,
-    String? debugLabel,
-  }) : super(
-          coordinator,
-          initialScrollOffset: initialScrollOffset,
-          debugLabel: debugLabel,
-        );
+    _ExtendedNestedScrollCoordinator super.coordinator, {
+    super.initialScrollOffset,
+    super.debugLabel,
+  });
   @override
   _ExtendedNestedScrollCoordinator get coordinator =>
       super.coordinator as _ExtendedNestedScrollCoordinator;
@@ -1799,8 +1808,9 @@ class ExtendedNestedScrollController extends _NestedScrollController {
   void attach(ScrollPosition position) {
     assert(position is _NestedScrollPosition);
     super.attach(position);
-    coordinator.updateParent();
-    coordinator.updateCanDrag(position: position as _NestedScrollPosition);
+    coordinator
+      ..updateParent()
+      ..updateCanDrag(position: position as _NestedScrollPosition);
     position.addListener(_scheduleUpdateShadow);
     _scheduleUpdateShadow();
   }
