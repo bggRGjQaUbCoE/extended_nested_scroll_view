@@ -1,5 +1,3 @@
-// ignore_for_file: unnecessary_cast
-
 import 'dart:math' as math;
 
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
@@ -11,8 +9,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 part 'extended_nested_scroll_view_part.dart';
-
-// ignore_for_file: unnecessary_null_comparison, always_put_control_body_on_new_line
 
 /// A scrolling view inside of which can be nested other scrolling views, with
 /// their scroll positions being intrinsically linked.
@@ -283,12 +279,7 @@ class ExtendedNestedScrollView extends StatefulWidget {
     this.pinnedHeaderSliverHeightBuilder,
     this.onlyOneScrollInBody = false,
     this.keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.manual,
-  })  : assert(scrollDirection != null),
-        assert(reverse != null),
-        assert(headerSliverBuilder != null),
-        assert(body != null),
-        assert(floatHeaderSlivers != null),
-        assert(clipBehavior != null);
+  });
 
   /// Get the total height of pinned header in NestedScrollView header.
   final NestedScrollViewPinnedHeaderSliverHeightBuilder?
@@ -669,8 +660,7 @@ class _InheritedNestedScrollView extends InheritedWidget {
   const _InheritedNestedScrollView({
     required this.state,
     required super.child,
-  })  : assert(state != null),
-        assert(child != null);
+  });
 
   final ExtendedNestedScrollViewState state;
 
@@ -921,7 +911,6 @@ class _NestedScrollCoordinator
 
   _NestedScrollMetrics _getMetrics(
       _NestedScrollPosition innerPosition, double velocity) {
-    assert(innerPosition != null);
     double pixels, minRange, maxRange, correctionOffset;
     double extra = 0.0;
     if (innerPosition.pixels == innerPosition.minScrollExtent) {
@@ -1230,8 +1219,7 @@ class _NestedScrollCoordinator
         if (position.pixels == 0.0) {
           final physics = position.physics.parent;
           if (physics is RefreshScrollPhysics &&
-              (physics as RefreshScrollPhysics)
-                  .onDrag(delta, position.viewportDimension)) {
+              physics.onDrag(delta, position.viewportDimension)) {
             return;
           }
         } else if (position.pixels < 0.0) {
