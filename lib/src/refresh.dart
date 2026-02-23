@@ -19,14 +19,6 @@ class RefreshScrollPhysics extends ClampingScrollPhysics {
   }
 
   @override
-  double applyBoundaryConditions(ScrollMetrics position, double value) {
-    if (value > 0.0 && onDrag(-value, position.viewportDimension)) {
-      return value - position.minScrollExtent;
-    }
-    return super.applyBoundaryConditions(position, value);
-  }
-
-  @override
   double applyPhysicsToUserOffset(ScrollMetrics position, double offset) {
     if (offset < 0.0 && onDrag(offset, position.viewportDimension)) {
       return 0.0;
