@@ -70,8 +70,7 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
     }
 
     for (int i = positions.length - 1; i >= 0; i--) {
-      final _ExtendedNestedScrollPosition scrollPosition =
-          positions.elementAt(i);
+      final scrollPosition = positions.elementAt(i);
       // TODO(zmtzawqlp): throw exception even mounted is true
       // In order for an element to have a valid renderObject, it must be '
       //  'active, which means it is part of the tree.\n'
@@ -135,6 +134,7 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
     final RenderViewport? parent = findParentRenderViewport(renderObject);
     if (parent != null && parent.axis == axis) {
       for (final RenderSliver childrenInPaint
+          // ignore: invalid_use_of_protected_member
           in parent.childrenInHitTestOrder) {
         return childIsVisible(childrenInPaint, renderObject) &&
             renderObjectIsVisible(parent, axis);
@@ -201,26 +201,27 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
 
 class ExtendedNestedScrollController extends _NestedScrollController {
   ExtendedNestedScrollController(
+    // ignore: library_private_types_in_public_api
     _ExtendedNestedScrollCoordinator super.coordinator, {
     super.initialScrollOffset,
     super.debugLabel,
   });
   @override
+  // ignore: library_private_types_in_public_api
   _ExtendedNestedScrollCoordinator get coordinator =>
       super.coordinator as _ExtendedNestedScrollCoordinator;
 
   @override
+  // ignore: library_private_types_in_public_api
   Iterable<_ExtendedNestedScrollPosition> get nestedPositions =>
       kDebugMode ? _debugNestedPositions : _releaseNestedPositions;
 
   Iterable<_ExtendedNestedScrollPosition> get _debugNestedPositions {
-    return Iterable.castFrom<ScrollPosition, _ExtendedNestedScrollPosition>(
-        positions);
+    return positions.cast<_ExtendedNestedScrollPosition>();
   }
 
   Iterable<_ExtendedNestedScrollPosition> get _releaseNestedPositions sync* {
-    yield* Iterable.castFrom<ScrollPosition, _ExtendedNestedScrollPosition>(
-        positions);
+    yield* positions.cast<_ExtendedNestedScrollPosition>();
   }
 
   @override
@@ -300,9 +301,7 @@ class _ExtendedNestedScrollPosition extends _NestedScrollPosition {
   }
 
   /// Whether is actived now
-  bool get isActived {
-    return _isActived;
-  }
+  bool get isActived => _isActived;
 }
 
 class _ExtendedSliverFillRemainingWithScrollable
