@@ -414,6 +414,10 @@ class ExtendedNestedScrollViewState extends State<ExtendedNestedScrollView> {
   /// [innerPositions] is single one when [onlyOneScrollInBody] is true.
   Iterable<ScrollPosition> get innerPositions => _coordinator!._innerPositions;
 
+  // ignore: library_private_types_in_public_api
+  Iterable<_ExtendedNestedScrollPosition> get innerNestedPositions =>
+      _coordinator!._innerPositions;
+
   _ExtendedNestedScrollCoordinator? _coordinator;
 
   @protected
