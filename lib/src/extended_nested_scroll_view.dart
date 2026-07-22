@@ -1078,8 +1078,6 @@ class _NestedScrollCoordinator
 
   @override
   void applyUserOffset(double delta) {
-    updateUserScrollDirection(
-        delta > 0.0 ? ScrollDirection.forward : ScrollDirection.reverse);
     assert(delta != 0.0);
     if (_innerPositions.isEmpty) {
       _outerPosition!.applyFullDragUpdate(delta);
@@ -1148,6 +1146,8 @@ class _NestedScrollCoordinator
         }
       }
     }
+    updateUserScrollDirection(
+        delta > 0.0 ? ScrollDirection.forward : ScrollDirection.reverse);
   }
 
   void setParent(ScrollController? value) {
@@ -1356,7 +1356,7 @@ class _NestedScrollPosition extends ScrollPosition
       forcePixels(actualNewPixels);
       didUpdateScrollPositionBy(actualNewPixels - oldPixels);
     }
-    if (overscroll != 0.0) {
+    if (overscroll != 0.0 && activity!.isScrolling) {
       didOverscrollBy(overscroll);
       return overscroll;
     }
