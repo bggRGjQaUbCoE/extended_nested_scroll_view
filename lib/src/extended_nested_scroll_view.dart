@@ -1111,6 +1111,8 @@ class _NestedScrollCoordinator
             position.applyFullDragUpdate(innerDelta);
           }
         }
+      } else {
+        return;
       }
     } else {
       // Dragging "down" - delta is positive
