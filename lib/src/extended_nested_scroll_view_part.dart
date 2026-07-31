@@ -89,15 +89,6 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
           continue;
         }
 
-        final VisibilityInfo? visibilityInfo = ExtendedVisibilityDetector.of(
-            scrollPosition.context.storageContext);
-        if (visibilityInfo != null && visibilityInfo.visibleFraction == 1) {
-          // if (kDebugMode) {
-          //   print('${visibilityInfo.key} is visible');
-          // }
-          return <_ExtendedNestedScrollPosition>[scrollPosition];
-        }
-
         if (renderObjectIsVisible(renderObject, bodyScrollDirection)) {
           return <_ExtendedNestedScrollPosition>[scrollPosition];
         }
