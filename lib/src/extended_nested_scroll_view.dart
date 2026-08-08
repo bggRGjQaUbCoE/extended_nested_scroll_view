@@ -1090,7 +1090,7 @@ class _NestedScrollCoordinator
         if (position.pixels == 0.0) {
           final physics = position.physics.parent;
           if (physics is RefreshScrollPhysicsMixin &&
-              physics.onDrag(delta, position.viewportDimension)) {
+              physics.onDrag(delta)) {
             return;
           }
         } else if (position.pixels < 0.0) {
