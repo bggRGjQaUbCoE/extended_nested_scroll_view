@@ -56,14 +56,13 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
 
   @override
   Iterable<_ExtendedNestedScrollPosition> get _innerPositions {
-    final Iterable<_ExtendedNestedScrollPosition> positions =
-        _innerController.nestedPositions;
+    final positions = _innerController.nestedPositions;
 
     if (positions.length <= 1 || !onlyOneScrollInBody) {
       return positions;
     }
 
-    final Iterable<_ExtendedNestedScrollPosition> actived =
+    final actived =
         positions.where((_ExtendedNestedScrollPosition e) => e.isActived);
     if (actived.isNotEmpty) {
       return actived;
@@ -271,18 +270,13 @@ class _ExtendedNestedScrollPosition extends _NestedScrollPosition {
       maxScrollExtent = math.max(0.0, maxScrollExtent);
     }
 
-    /// 修复不满屏时，滑动卡顿的问题
-    if (debugLabel == 'inner' &&
-        coordinator.pinnedHeaderSliverHeightBuilder != null) {
-      maxScrollExtent = math.max(maxScrollExtent, 0.1);
-    }
     return super.applyContentDimensions(minScrollExtent, maxScrollExtent);
   }
 
   bool _isActived = false;
   @override
   Drag drag(DragStartDetails details, VoidCallback dragCancelCallback) {
-    //print('drag--$debugLabel');
+    // print('drag--$debugLabel');
     _isActived = true;
     return coordinator.drag(details, () {
       dragCancelCallback();
@@ -323,20 +317,4 @@ class _ExtendedRenderSliverFillRemainingWithScrollable
 extension DoubleEx on double {
   bool get notZero => abs() > precisionErrorTolerance;
   bool get isZero => abs() < precisionErrorTolerance;
-}
-
-class _ExtendedNestedInnerBallisticScrollActivity
-    extends _NestedInnerBallisticScrollActivity {
-  _ExtendedNestedInnerBallisticScrollActivity(
-    super.coordinator,
-    super.position,
-    super.simulation,
-    super.vsync,
-    super.shouldIgnorePointer,
-  );
-  @override
-  bool applyMoveTo(double value) {
-    // https://github.com/flutter/flutter/pull/87801
-    return delegate.setPixels(coordinator.nestOffset(value, delegate)).isZero;
-  }
 }

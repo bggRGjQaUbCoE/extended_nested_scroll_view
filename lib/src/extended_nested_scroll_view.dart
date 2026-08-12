@@ -1089,8 +1089,7 @@ class _NestedScrollCoordinator
       for (final _NestedScrollPosition position in _innerPositions) {
         if (position.pixels == 0.0) {
           final physics = position.physics.parent;
-          if (physics is RefreshScrollPhysicsMixin &&
-              physics.onDrag(delta)) {
+          if (physics is RefreshScrollPhysicsMixin && physics.onDrag(delta)) {
             return;
           }
         } else if (position.pixels < 0.0) {
@@ -1137,6 +1136,8 @@ class _NestedScrollCoordinator
         }
         if (outerDelta.notZero) {
           outerDelta -= _outerPosition!.applyClampedDragUpdate(outerDelta);
+        } else {
+          _outerPosition!.context.setIgnorePointer(false);
         }
 
         // Now deal with any overscroll
@@ -1457,7 +1458,7 @@ class _NestedScrollPosition extends ScrollPosition
           shouldIgnorePointer,
         );
       case _NestedBallisticScrollActivityMode.inner:
-        return _ExtendedNestedInnerBallisticScrollActivity(
+        return _NestedInnerBallisticScrollActivity(
           coordinator,
           this,
           simulation,
