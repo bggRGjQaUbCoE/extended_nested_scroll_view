@@ -13,7 +13,8 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
     this.pinnedHeaderSliverHeightBuilder,
     this.onlyOneScrollInBody,
     this.scrollDirection,
-  ) {
+  ) : bodyScrollDirection =
+            scrollDirection == Axis.vertical ? Axis.horizontal : Axis.vertical {
     final double initialScrollOffset = _parent?.initialScrollOffset ?? 0.0;
     _outerController = ExtendedNestedScrollController(
       this,
@@ -28,7 +29,6 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
   }
 
   /// Get the total height of pinned header in NestedScrollView header.
-
   final NestedScrollViewPinnedHeaderSliverHeightBuilder?
       pinnedHeaderSliverHeightBuilder;
 
@@ -37,7 +37,6 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
   /// [_innerController.nestedPositions] will have more one,
   /// will scroll all of scroll positions together.
   /// set [onlyOneScrollInBody] true to avoid it.
-
   final bool onlyOneScrollInBody;
 
   /// The axis along which the scroll view scrolls.
@@ -45,14 +44,13 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
   /// Defaults to [Axis.vertical].
   final Axis scrollDirection;
 
+  /// The [TabBarView]/[PageView] in body should perpendicular with The Axis of
+  /// [ExtendedNestedScrollView].
+  final Axis bodyScrollDirection;
+
   @override
   ExtendedNestedScrollController get _innerController =>
       super._innerController as ExtendedNestedScrollController;
-
-  /// The [TabBarView]/[PageView] in body should perpendicular with The Axis of
-  /// [ExtendedNestedScrollView].
-  Axis get bodyScrollDirection =>
-      scrollDirection == Axis.vertical ? Axis.horizontal : Axis.vertical;
 
   @override
   Iterable<_ExtendedNestedScrollPosition> get _innerPositions {
@@ -153,11 +151,10 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
 
   @override
   void updateCanDrag({_NestedScrollPosition? position}) {
-    double maxInnerExtent = 0.0;
-
     if (onlyOneScrollInBody &&
         position != null &&
         position.debugLabel == 'inner') {
+      double maxInnerExtent = 0.0;
       if (position.haveDimensions) {
         maxInnerExtent = math.max(
           maxInnerExtent,
@@ -169,23 +166,8 @@ class _ExtendedNestedScrollCoordinator extends _NestedScrollCoordinator {
             position.minScrollExtent != position.maxScrollExtent);
       }
     }
-    if (!_outerPosition!.haveDimensions) {
-      return;
-    }
 
-    bool innerCanDrag = false;
-    for (final _NestedScrollPosition position in _innerPositions) {
-      if (!position.haveDimensions) {
-        return;
-      }
-      innerCanDrag = innerCanDrag
-          // This refers to the physics of the actual inner scroll position, not
-          // the whole NestedScrollView, since it is possible to have different
-          // ScrollPhysics for the inner and outer positions.
-          ||
-          position.physics.shouldAcceptUserOffset(position);
-    }
-    _outerPosition!.updateCanDrag(innerCanDrag);
+    super.updateCanDrag();
   }
 }
 
