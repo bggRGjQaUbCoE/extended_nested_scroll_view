@@ -1,5 +1,5 @@
 
-import 'package:flutter/material.dart' show ScrollPhysics, ScrollMetrics;
+import 'package:material_ui/material_ui.dart' show ScrollPhysics, ScrollMetrics;
 
 typedef OnDrag = bool Function(double offset);
 
