@@ -4,9 +4,9 @@ import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:extended_nested_scroll_view/refresh.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:material_ui/material_ui.dart';
 
 part 'extended_nested_scroll_view_part.dart';
 
@@ -420,6 +420,17 @@ class ExtendedNestedScrollViewState extends State<ExtendedNestedScrollView> {
 
   _ExtendedNestedScrollCoordinator? _coordinator;
 
+  set onlyInnerScroll(bool value) {
+    if (value) {
+      final pos = innerNestedPositions;
+      if (pos.length == 1) {
+        _coordinator!.onlyInnerScroll = pos.first.hashCode;
+        return;
+      }
+    }
+    _coordinator!.onlyInnerScroll = null;
+  }
+
   @protected
   @override
   void initState() {
@@ -639,6 +650,8 @@ class _NestedScrollCoordinator
   late _NestedScrollController _outerController;
   late _NestedScrollController _innerController;
 
+  int? onlyInnerScroll;
+
   bool get outOfRange {
     return (_outerPosition?.outOfRange ?? false) ||
         _innerPositions
@@ -754,6 +767,10 @@ class _NestedScrollCoordinator
     _NestedScrollPosition? innerPosition;
     if (velocity != 0.0) {
       for (final _NestedScrollPosition position in _innerPositions) {
+        if (position.hashCode == onlyInnerScroll && velocity < 0) {
+          velocity = 0;
+          break;
+        }
         if (innerPosition != null) {
           if (velocity > 0.0) {
             if (innerPosition.pixels < position.pixels) {
@@ -1131,7 +1148,9 @@ class _NestedScrollCoordinator
             _innerPositions.toList();
         for (final position in innerPositions) {
           final double overscroll = position.applyClampedDragUpdate(innerDelta);
-          outerDelta = math.max(outerDelta, overscroll);
+          if (position.hashCode != onlyInnerScroll) {
+            outerDelta = math.max(outerDelta, overscroll);
+          }
           overscrolls.add(overscroll);
         }
         if (outerDelta.notZero) {
